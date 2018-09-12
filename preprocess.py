@@ -8,7 +8,7 @@ on the song lyrics dataset. The following steps are covered:
 - re-concatenates words for TFIDF vectorization
 - writes updated dataframe to a csv file
 
-To execute this script, run the follow command in your terminal:
+To execute this script, run the following command in your terminal:
 ```
 python preprocess.py --filter_by=genre --subset=rock (optional)
 ```

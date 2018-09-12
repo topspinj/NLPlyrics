@@ -6,11 +6,11 @@ Fetches a list of artists by: 1) popularity or 2) first letter.
 This script is useful if you want to analyze a particular artist
 but are not sure if it's in the dataset.
 
-To execute this script, run the follow command in your terminal:
+To get most popular artists, run the following command in your terminal:
 ```
 python artist_rolodex.py --popular
 ```
-or
+To get artists that start with the letter 'n', run this command:
 ```
 python artist_rolodex.py --first_letter=n
 ```
@@ -35,9 +35,13 @@ if __name__ == "__main__":
 
     pd.options.mode.chained_assignment = None
 
+    if len(args.first_letter) > 1:
+        raise ValueError("first_letter arg must be 1 character.")
+
     print("Loading data...")
     data = pd.read_csv("data/lyrics.csv")
     data = data.dropna()
+
     if args.first_letter:
         data['artist_first_letter'] = data['artist'].apply(lambda x: x[0])
         subset_data = data[data['artist_first_letter'] == args.first_letter]
