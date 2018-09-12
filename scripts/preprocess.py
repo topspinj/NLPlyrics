@@ -72,7 +72,7 @@ if __name__ == "__main__":
     pd.options.mode.chained_assignment = None
 
     print("Loading data...")
-    data = pd.read_csv("data/lyrics.csv")
+    data = pd.read_csv("../data/lyrics.csv")
     data = data.dropna()
 
     subset = args.subset
@@ -96,6 +96,6 @@ if __name__ == "__main__":
     print("Concatenating lyrics...")
     lyrics['processed_lyrics'] = lyrics['tokenized_lyrics'].apply(lambda x: ' '.join(x))
 
-    path = "data/lyrics_{:s}.csv".format(args.subset.lower())
+    path = "../data/lyrics_{:s}.csv".format(args.subset.lower())
     lyrics.to_csv(path)
     print("CSV file saved! Check path: {:s}".format(path))
