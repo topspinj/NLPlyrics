@@ -91,7 +91,6 @@ if __name__ == "__main__":
 
     print("Lemmatizing tokens...")
     lyrics['tokenized_lyrics'] = lyrics['tokenized_lyrics'].apply(lemmatize_lyrics)
-    print(lyrics['tokenized_lyrics'][249])
 
     print("Concatenating lyrics...")
     processed_lyrics = lyrics['tokenized_lyrics'].apply(lambda x: ' '.join(x))
