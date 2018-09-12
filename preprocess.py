@@ -10,7 +10,7 @@ on the song lyrics dataset. The following steps are covered:
 
 To execute this script, run the follow command in your terminal:
 ```
-python preprocess.py --genre=hiphop (optional)
+python preprocess.py --filter_by=genre --subset=rock (optional)
 ```
 Due to the large nature of this dataset, lyrics are processed
 by genre. Indicate which genre to process using the `genre` arg.
@@ -64,7 +64,8 @@ def lemmatize_lyrics(tokens):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Song lyric cleaning and pre-processing")
-    parser.add_argument('--genre', type=str, dest='genre', default='hiphop')
+    parser.add_argument('--filter_by', type=str, dest='filter', default='genre')
+    parser.add_argument('--subset', type=str, dest='subset', default='rock')
 
     args = parser.parse_args()
 
@@ -73,13 +74,17 @@ if __name__ == "__main__":
     print("Loading data...")
     data = pd.read_csv("data/lyrics.csv")
     data = data.dropna()
-    genre = args.genre.capitalize()
-    if genre == 'Hiphop':
-        genre = 'Hip-Hop'
-    lyrics = data[data['genre'] == genre]
-    print("Number of {:s} songs: ".format(genre), lyrics.shape[0])
 
-    print("Tokenizing lyrics for all songs of genre {:s}...".format(genre))
+    subset = args.subset
+    if args.filter == 'genre':
+        subset = args.subset.capitalize()
+        if subset == 'Hiphop':
+            subset = 'Hip-Hop'
+        
+    lyrics = data[data[args.filter] == subset]
+    print("Number of {:s} songs: ".format(subset), lyrics.shape[0])
+
+    print("Tokenizing lyrics for all {:s} songs...".format(subset))
     lyrics['tokenized_lyrics'] = lyrics['lyrics'].apply(tokenize_lyrics)
 
     print("Calculating word count...")
@@ -91,6 +96,6 @@ if __name__ == "__main__":
     print("Concatenating lyrics...")
     lyrics['processed_lyrics'] = lyrics['tokenized_lyrics'].apply(lambda x: ' '.join(x))
 
-    path = "data/lyrics_{:s}.csv".format(args.genre.lower())
+    path = "data/lyrics_{:s}.csv".format(args.subset.lower())
     lyrics.to_csv(path)
     print("CSV file saved! Check path: {:s}".format(path))
