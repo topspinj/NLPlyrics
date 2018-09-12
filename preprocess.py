@@ -26,16 +26,48 @@ sys.path.insert(0, os.path.abspath(".."))
 import argparse
 import pandas as pd
 import numpy as np
+import nltk 
+
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import save_npz
 
-from utils import tokenize_lyrics, lemmatize_lyrics
+def tokenize_lyrics(x, min_length=2):
+    """
+    Tokenizes a string of lyrics, filters out
+    stopwords, strips words that start or end with
+    special punctuation (-, ., /).
+
+    Args
+    ----
+    x : str
+        string of lyrics
+    min_length : int
+        minimum length of word to include in tokenized list
+
+    Returns
+    -------
+    list
+        list of tokenized words
+    """
+    custom_stopwords = ["'s", "n't", "'m", "'re", "'ll","'ve","...", "ä±", "''", '``','--', "'d", 'el', 'la']
+    stopwords = nltk.corpus.stopwords.words('english') + custom_stopwords
+    tokens = nltk.word_tokenize(x.lower())
+    tokens = [t.strip('-./') for t in tokens]
+    tokenized = [t for t in tokens if len(t) > min_length and t.isalpha() and t not in stopwords]
+    return tokenized
+
+def lemmatize_lyrics(tokens):
+    """
+    Lemmatizes tokens using NLTK's lemmatizer tool.
+    """
+    lemmatized = [nltk.stem.WordNetLemmatizer().lemmatize(t) for t in tokens]
+    return lemmatized
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(
         description="Data cleaning and feature engineering")
     parser.add_argument('--save_csv', dest='save', default=False, action='store_true')
-    parser.add_argument('genre', type=str, dest='genre', default='hiphop')
+    parser.add_argument('--genre', type=str, dest='genre', default='hiphop')
 
     args = parser.parse_args()
 
@@ -43,16 +75,23 @@ if __name__ == "__main__":
 
     print("Loading data...")
     data = pd.read_csv("data/lyrics.csv")
+    data = data.dropna()
     genre = args.genre.capitalize()
-    if args.genre == 'Hiphop':
+    if genre == 'Hiphop':
         genre = 'Hip-Hop'
     lyrics = data[data['genre'] == genre]
+    print("Number of {:s} songs: ".format(genre), lyrics.shape[0])
 
-    print("Tokenizing lyrics for all songs of genre {:s}...".format(args.genre))
+    print("Tokenizing lyrics for all songs of genre {:s}...".format(genre))
     lyrics['tokenized_lyrics'] = lyrics['lyrics'].apply(tokenize_lyrics)
+    print(lyrics['tokenized_lyrics'][249])
+
+    print("Calculating word count...")
+    lyrics['word_count'] = lyrics['tokenized_lyrics'].apply(len)
 
     print("Lemmatizing tokens...")
     lyrics['tokenized_lyrics'] = lyrics['tokenized_lyrics'].apply(lemmatize_lyrics)
+    print(lyrics['tokenized_lyrics'][249])
 
     print("Concatenating lyrics...")
     processed_lyrics = lyrics['tokenized_lyrics'].apply(lambda x: ' '.join(x))
