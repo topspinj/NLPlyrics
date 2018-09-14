@@ -73,7 +73,9 @@ if __name__ == "__main__":
 
     print("Loading data...")
     data = pd.read_csv("../data/lyrics.csv")
+    print("Dropping duplicates and missing values...")
     data = data.dropna()
+    data = data.drop_duplicates(subset=['artist', 'song'])
 
     subset = args.subset
     if args.filter == 'genre':
