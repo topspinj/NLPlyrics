@@ -28,8 +28,9 @@ import nltk
 
 from sklearn.feature_extraction.text import TfidfVectorizer
 from scipy.sparse import save_npz
+from nltk.stem import WordNetLemmatizer
 
-def tokenize_lyrics(x, min_length=2):
+def tokenize_lyrics(x, min_length=3):
     """
     Tokenizes a string of lyrics, filters out
     stopwords, strips words that start or end with
